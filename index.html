@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Juego de Cartas Pro | Colección Premium</title>
+  <meta name="description" content="Juega Chinchón, Escoba, Mus y Tute en esta plataforma premium de cartas españolas con seguimiento de puntuaciones.">
+  <link rel="stylesheet" href="styles/index.css">
+</head>
+<body>
+  <header>
+    <h1>Juego de Cartas Pro</h1>
+    <p class="subtitle">La colección definitiva de clásicos españoles</p>
+  </header>
+
+  <section id="user-section">
+    <input type="text" id="username-input" placeholder="Nombre de usuario" maxlength="15">
+    <button class="primary-btn" id="add-user-btn">Unirse</button>
+  </section>
+
+  <section id="leaderboard" style="width: 90%; max-width: 500px; padding: 1.5rem; background: var(--glass); border-radius: 15px; border: 1px solid var(--glass-border); margin-bottom: 2rem;">
+    <h3 style="color: var(--primary); text-align: center; margin-bottom: 1rem; text-transform: uppercase;">🏆 TOP JUGADORES (Global)</h3>
+    <div id="leaderboard-list"></div>
+  </section>
+
+  <div class="game-grid">
+    <!-- Chinchón Card -->
+    <div class="game-card" id="game-chinchon" onclick="startGame('chinchon')">
+      <h2>Chinchón</h2>
+      <p class="description">Forma escaleras y grupos del mismo número. El objetivo: quedarte con la menor puntuación posible.</p>
+      <div class="status">Prestigio: <span id="chinchon-status">Básico</span></div>
+    </div>
+
+    <!-- Escoba Card -->
+    <div class="game-card" id="game-escoba" onclick="startGame('escoba')">
+      <h2>Escoba</h2>
+      <p class="description">Suma 15 puntos con tus cartas y las de la mesa. ¡No olvides el 7 de oros!</p>
+      <div class="status">Prestigio: <span id="escoba-status">Básico</span></div>
+    </div>
+
+    <!-- Mus Card -->
+    <div class="game-card" id="game-mus" onclick="startGame('mus')">
+      <h2>Mus</h2>
+      <p class="description">Grande, Chica, Pares y Juego. El arte de farolear y las señas en el juego más noble.</p>
+      <div class="status">Prestigio: <span id="mus-status">Maestro</span></div>
+    </div>
+
+    <!-- Tute Card -->
+    <div class="game-card" id="game-tute" onclick="startGame('tute')">
+      <h2>Tute</h2>
+      <p class="description">Cruza tus cartas en este duelo de estrategias por parejas. ¡Las 40 de bastos!</p>
+      <div class="status">Prestigio: <span id="tute-status">Básico</span></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="game-overlay">
+    <div class="game-container">
+        <button class="close-btn" onclick="closeGame()">×</button>
+        <div id="game-canvas">
+            <!-- Game dynamic content goes here -->
+            <h2 id="game-title" style="color: var(--primary); text-align: center;"></h2>
+            <div id="game-info" style="margin-top: 1rem; color: white;"></div>
+        </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
