@@ -27,7 +27,7 @@ export class Board {
 
     if (faceUp) {
       cardEl.innerHTML = `
-        <div class="card-inner" style="background-image: url('../assets/cards/${card.suit}_${card.rank}.jpg'); background-size: cover;">
+        <div class="card-inner" style="background-image: url('assets/cards/${card.suit}_${card.rank}.jpg'); background-size: cover;">
         </div>
       `;
     } else {
