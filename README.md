@@ -1,4 +1,4 @@
-Nuestra plataforma incluye cuatro clásicos, cada uno con sus propias reglas y mecánicas fielmente implementadas:
+La plataforma incluye cuatro clásicos, cada uno con sus propias reglas y mecánicas fielmente implementadas:
 
 ### 🀄 Chinchón
 * **Mecánica:** Forma escaleras y grupos del mismo número. 
@@ -17,5 +17,6 @@ Nuestra plataforma incluye cuatro clásicos, cada uno con sus propias reglas y m
 * **¡Cántico!:** ¡Cuidado con las 40 de bastos!
 
 Los juegos de Mus y Tute no están aún testeados corectamente.
+La versión para móvil la estoy ajustando, y falta testear.
 Se puede jugar online via wifi
-Los grafiscos de las cartas están sacados de: https://github.com/AlbertoCruzLuis/Spanish-Deck-Images Gracias por tu trabajo.
+Los gráficos de las cartas están sacados de: https://github.com/AlbertoCruzLuis/Spanish-Deck-Images Gracias por tu trabajo.
