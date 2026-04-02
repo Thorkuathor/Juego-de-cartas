@@ -1,22 +1,18 @@
-La plataforma incluye cuatro clásicos, cada uno con sus propias reglas y mecánicas fielmente implementadas:
+# 🃏 Proyecto: Juego de Cartas Pro
 
-### 🀄 Chinchón
-* **Mecánica:** Forma escaleras y grupos del mismo número. 
-* **Objetivo:** Quedarte con la menor puntuación posible.
+¡Hola! Este es tu nuevo espacio de trabajo "fuera" del playground. 
 
-### 🧹 Escoba
-* **Mecánica:** Suma 15 puntos con tus cartas y las de la mesa.
-* **¡Consejo!:** No olvides el 7 de oros, ¡es clave!
+## Estructura Recomendada:
+- `/assets`: Imágenes y sonidos.
+- `/src`: Lógica de Javascript.
+- `/styles`: CSS y diseño visual.
 
-### 🤫 Mus
-* **Mecánica:** Grande, Chica, Pares y Juego. 
-* **Filosofía:** El arte de farolear y las señas en el juego más noble.
+---
 
-### 🤝 Tute
-* **Mecánica:** Cruza tus cartas en este duelo de estrategias por parejas.
-* **¡Cántico!:** ¡Cuidado con las 40 de bastos!
+## Cómo seguir trabajando:
+Puedes abrir esta carpeta (`C:\proyectos web\juegos de cartas`) en **VS Code** u otro editor. 
 
-Los juegos de Mus y Tute no están aún testeados corectamente.
-La versión para móvil la estoy ajustando, y falta testear.
-Se puede jugar online via wifi
-Los gráficos de las cartas están sacados de: https://github.com/AlbertoCruzLuis/Spanish-Deck-Images Gracias por tu trabajo.
+Para que yo siga ayudándote, solo dime:
+> *"Actúa como **Maestro de Cartas** y añade la lógica de [X] al archivo `script.js`."*
+
+¡Tu equipo de expertos está listo! 🏛️🎨🛡️🃏

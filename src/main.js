@@ -9,7 +9,7 @@ import { AIEngine } from './core/AIEngine.js';
 import { MultiplayerManager } from './multiplayer/MultiplayerManager.js';
 
 const userManager = new UserManager();
-const board = new Board('game-canvas');
+const board = new Board('game-board');
 let activeUser = null;
 let activeGame = null;
 let mp = null; // multiplayer manager instance
@@ -686,12 +686,15 @@ window.exitMultiplayerGame = () => {
 function startEscoba() {
     activeGame = new EscobaGame([activeUser.name, 'IA Bot']);
     activeGame.start();
-    renderEscobaBoard();
+    renderEscobaBoard(true);
 }
 
-function renderEscobaBoard() {
+function renderEscobaBoard(isDeal = false) {
     const redealt = activeGame.checkRedeal();
-    if (redealt) alert('¡Mano terminada! Nuevas cartas repartidas del mazo.');
+    if (redealt) {
+        alert('¡Mano terminada! Nuevas cartas repartidas del mazo.');
+        isDeal = true;
+    }
 
     const isGameOver = activeGame.players.every(p => p.hand.length === 0) && activeGame.deck.remaining === 0;
     if (isGameOver) {
@@ -740,14 +743,17 @@ function renderEscobaBoard() {
     const moveBtn = document.getElementById('make-move-btn');
 
     // Render Table
-    activeGame.tableCards.forEach(card => {
+    activeGame.tableCards.forEach((card, index) => {
         const cardEl = board.renderCard(card);
+        if (isDeal) cardEl.classList.add('dealt');
         tableArea.appendChild(cardEl);
     });
 
     // Render Player Hand
-    activeGame.players[0].hand.forEach(card => {
+    activeGame.players[0].hand.forEach((card, index) => {
         const cardEl = board.renderCard(card);
+        if (isDeal) cardEl.classList.add('dealt');
+        if (isDeal) cardEl.style.animationDelay = `${index * 0.1}s`; /* Staggered effect */
         handArea.appendChild(cardEl);
     });
 
@@ -767,7 +773,7 @@ function renderEscobaBoard() {
             // Player wants to discard the card to the table
             activeGame.tableCards.push(handCard);
             activeGame.players[0].hand = activeGame.players[0].hand.filter(c => c !== handCard);
-            alert(`Has puesto el ${handSelection[0].rank} de ${handSelection[0].suit} en la mesa.`);
+            // alert(`Has puesto el ${handSelection[0].rank} de ${handSelection[0].suit} en la mesa.`);
             setTimeout(() => performAITurnEscoba(), 1000);
             renderEscobaBoard();
             return;
@@ -875,7 +881,7 @@ function performAITurnEscoba() {
         const move = AIEngine.getEscobaMove(aiPlayer.hand, activeGame.tableCards);
         const result = activeGame.playTurn(aiPlayer, move.handCard, move.tableSubset);
         
-        alert(`La IA ha jugado el ${move.handCard.name}. ${result.message}`);
+        // alert(`La IA ha jugado el ${move.handCard.name}. ${result.message}`);
         renderEscobaBoard();
     }, 1200);
 }
@@ -883,10 +889,10 @@ function performAITurnEscoba() {
 function startChinchon() {
     activeGame = new ChinchonGame([activeUser.name, 'IA Bot']);
     activeGame.start();
-    renderChinchonBoard();
+    renderChinchonBoard(true);
 }
 
-function renderChinchonBoard() {
+function renderChinchonBoard(isDeal = false) {
     const state = activeGame.getGameState(0);
     const aiState = activeGame.getGameState(1);
 
@@ -950,10 +956,14 @@ function renderChinchonBoard() {
     // --- Hand rendering with drag-to-reorder ---
     let dragSrcIndex = null;
 
-    function renderHandCards() {
+    function renderHandCards(forDeal = false) {
         handArea.innerHTML = '';
         activeGame.players[0].hand.forEach((card, index) => {
             const cardEl = board.renderCard(card);
+            if (forDeal) {
+                cardEl.classList.add('dealt');
+                cardEl.style.animationDelay = `${index * 0.1}s`;
+            }
             // Always draggable for reordering; also draggable to discard zone if turn allows
             cardEl.draggable = true;
             cardEl.style.cursor = 'grab';
@@ -1004,7 +1014,7 @@ function renderChinchonBoard() {
         };
     }
 
-    renderHandCards();
+    renderHandCards(isDeal);
 
     // Sort buttons
     document.getElementById('sort-by-rank-btn').onclick = () => {

@@ -92,11 +92,18 @@ button.primary-btn {
   cursor: pointer;
   font-weight: bold;
   transition: all 0.3s ease;
+  min-height: 44px; /* Mobile accessibility requirement */
+  touch-action: manipulation; /* Eliminate 300ms delay */
 }
 
 button.primary-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+}
+
+button.primary-btn:active {
+  transform: scale(0.95);
+  box-shadow: inset 0 3px 5px rgba(0,0,0,0.3);
 }
 
 /* Game Grid */
@@ -197,15 +204,20 @@ button.primary-btn:hover {
   width: var(--card-w);
   height: var(--card-h);
   background: #fdfaf5;
-  border-radius: 6px;
+  border-radius: 8px; /* Changed for softer look */
   position: relative;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.6);
   cursor: grab;
   color: #1a1a1a;
-  transition: all 0.4s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+  transition: transform 0.3s cubic-bezier(0.17, 0.67, 0.83, 0.67), box-shadow 0.3s ease, margin 0.3s ease;
   user-select: none;
   overflow: hidden;
   border: 1px solid rgba(0,0,0,0.2);
+  will-change: transform, opacity; /* High Performance Animations */
+}
+
+.card-entity.dealt {
+  animation: repartir 0.7s cubic-bezier(0.25, 1, 0.5, 1) both;
 }
 
 .card-inner {
@@ -229,10 +241,10 @@ button.primary-btn:hover {
 .suit-bastos .card-inner::after { content: ''; position: absolute; left: 0; top: 20%; height: 10%; width: 2px; background: #fff; z-index: 5; box-shadow: 0 40px 0 #fff, 0 80px 0 #fff; }
 .suit-bastos .card-inner::before { content: ''; position: absolute; right: 0; top: 20%; height: 10%; width: 2px; background: #fff; z-index: 5; box-shadow: 0 40px 0 #fff, 0 80px 0 #fff; }
 
-.card-entity:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-  z-index: 20;
+.card-entity:hover, .card-entity:active {
+  transform: translateY(-15px) scale(1.08); /* Selection pop up */
+  box-shadow: 0 15px 35px rgba(212, 175, 55, 0.6);
+  z-index: 50;
 }
 
 .card-entity.selected {
@@ -265,13 +277,14 @@ button.primary-btn:hover {
 
 .card-rank {
     position: absolute;
-    font-weight: 700;
-    font-size: 1.1rem;
+    font-weight: 900; /* Increased for better mobile visibility */
+    font-size: 1.3rem; /* Increase base size */
+    font-family: sans-serif; /* Sans-Serif explicitly */
     color: #3d2b0e;
     text-shadow: 0.5px 0.5px 0 rgba(255,255,255,0.5);
-    background: rgba(255,255,255,0.4);
-    width: 22px;
-    height: 22px;
+    background: rgba(255,255,255,0.5);
+    width: 25px;
+    height: 25px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -322,7 +335,7 @@ button.primary-btn:hover {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 2.2rem;
+    font-size: 2.8rem; /* Make the suit icon more visible */
 }
 
 .card-back {
@@ -339,24 +352,26 @@ button.primary-btn:hover {
 }
 
 /* Animations */
-@keyframes dealCard {
-    from {
+@keyframes repartir {
+    0% {
         opacity: 0;
-        transform: translate(-500px, -200px) rotate(-180deg) scale(0.5);
+        transform: translate(-300px, -200px) rotate(-180deg) scale(0.4);
     }
-    to {
+    100% {
         opacity: 1;
         transform: translate(0, 0) rotate(0) scale(1);
     }
 }
 
 /* Board Layout */
-#game-canvas {
+#game-board {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     padding: 1rem;
+    height: 100vh;
+    overflow: hidden;
 }
 
 .area-label {
@@ -387,8 +402,8 @@ button.primary-btn:hover {
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
   :root {
-    --card-w: 65px;
-    --card-h: 98px;
+    --card-w: 75px; /* Optimize relative width for screens */
+    --card-h: 112px;
   }
   
   h1 {
@@ -401,27 +416,44 @@ button.primary-btn:hover {
   }
   
   .game-container {
-    padding: 1rem;
+    padding: 0;
     width: 100%;
     height: 100%;
     border-radius: 0;
   }
   
-  #game-canvas {
+  #game-board {
     padding: 0.5rem;
+    height: 100vh;
+    overflow: hidden;
   }
   
   #table-area {
     gap: 0.5rem;
-    height: 140px;
     flex-wrap: wrap;
     align-content: center;
   }
   
   #hand-area {
     padding: 1rem 0;
-    gap: 0.3rem;
-    flex-wrap: wrap;
+    gap: 0; /* Remove gap */
+    flex-wrap: nowrap; /* Prevent wrap to force overlapping fan */
+  }
+
+  /* The Fan Effect for the Hand */
+  #hand-area .card-entity {
+    margin-left: -35px; /* Collapsible Space Saving */
+    transition: transform 0.3s cubic-bezier(0.17, 0.67, 0.83, 0.67), margin-left 0.3s;
+  }
+
+  #hand-area .card-entity:first-child {
+    margin-left: 0; /* First card doesn't need negative margin */
+  }
+
+  #hand-area .card-entity:hover,
+  #hand-area .card-entity:active {
+    transform: translateY(-20px) scale(1.15); /* Jump up to be picked */
+    z-index: 100;
   }
   
   .game-card h2 {

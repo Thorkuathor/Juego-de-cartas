@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Juego de Cartas Pro | Colección Premium</title>
   <meta name="description" content="Juega Chinchón, Escoba, Mus y Tute en esta plataforma premium de cartas españolas con seguimiento de puntuaciones.">
   <link rel="stylesheet" href="styles/index.css">
@@ -56,7 +56,8 @@
   <div class="overlay" id="game-overlay">
     <div class="game-container">
         <button class="close-btn" onclick="closeGame()">×</button>
-        <div id="game-canvas">
+        <div id="game-board" style="display: flex; flex-direction: column; height: 100vh; overflow: hidden;">
+            <!-- La zona del rival, pila, y mano se generan por JS -->
             <!-- Game dynamic content goes here -->
             <h2 id="game-title" style="color: var(--primary); text-align: center;"></h2>
             <div id="game-info" style="margin-top: 1rem; color: white;"></div>
