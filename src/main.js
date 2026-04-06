@@ -13,6 +13,7 @@ const board = new Board('game-board');
 let activeUser = null;
 let activeGame = null;
 let mp = null; // multiplayer manager instance
+window.aiDifficulty = 'experto';
 
 // UI Elements
 const usernameInput = document.getElementById('username-input');
@@ -82,16 +83,23 @@ window.startGame = (id) => {
 };
 
 function showModeSelection(gameId) {
-    const supportsMultiplayer = ['escoba', 'chinchon'].includes(gameId);
+    const supportsMultiplayer = ['escoba', 'chinchon', 'mus', 'tute'].includes(gameId);
     
     gameInfo.innerHTML = `
         <div style="text-align: center; padding: 2rem;">
             <h3 style="color: var(--primary); font-size: 1.5rem; margin-bottom: 2rem;">¿Cómo quieres jugar?</h3>
             
             <div style="display: flex; flex-direction: column; gap: 1.5rem; align-items: center;">
-                <button class="primary-btn" id="mode-ai-btn" style="padding: 1.5rem 3rem; font-size: 1.2rem; width: 320px; display:flex; align-items:center; justify-content:center; gap:0.8rem;">
-                    🤖 <span>Contra la IA</span>
-                </button>
+                <div style="display: flex; flex-direction: column; gap: 0.8rem; align-items: center; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                    <button class="primary-btn" id="mode-ai-btn" style="padding: 1.5rem 3rem; font-size: 1.2rem; width: 320px; display:flex; align-items:center; justify-content:center; gap:0.8rem;">
+                        🤖 <span>Contra la IA</span>
+                    </button>
+                    <select id="ai-difficulty-select" style="padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--primary); background: rgba(0,0,0,0.6); color: #fff; font-size: 0.9rem; cursor: pointer; outline: none; width: 100%;">
+                        <option value="principiante">👶 Nivel Principiante</option>
+                        <option value="experto" selected>🧠 Nivel Experto</option>
+                        <option value="pro">🔥 Nivel Pro</option>
+                    </select>
+                </div>
                 
                 ${supportsMultiplayer ? `
                 <div style="display: flex; align-items: center; gap: 1rem; color: rgba(255,255,255,0.3); width: 280px;">
@@ -116,6 +124,8 @@ function showModeSelection(gameId) {
 
     // VS AI button
     document.getElementById('mode-ai-btn').onclick = () => {
+        const diffSelect = document.getElementById('ai-difficulty-select');
+        if (diffSelect) window.aiDifficulty = diffSelect.value;
         if (gameId === 'escoba') startEscoba();
         else if (gameId === 'chinchon') startChinchon();
         else if (gameId === 'mus') startMus();
@@ -265,6 +275,10 @@ function startMultiplayerGame(gameId) {
         startMultiplayerEscoba();
     } else if (gameId === 'chinchon') {
         startMultiplayerChinchon();
+    } else if (gameId === 'mus') {
+        startMultiplayerMus();
+    } else if (gameId === 'tute') {
+        startMultiplayerTute();
     }
 }
 
@@ -337,9 +351,11 @@ function renderMultiplayerEscobaBoard() {
 
     gameInfo.innerHTML = `
         <div id="escoba-ui">
-            <div style="text-align: right; margin-bottom: 0.5rem;">
-                <span style="color:#4dff88; font-size:0.8rem; border:1px solid #4dff88; padding:0.2rem 0.6rem; border-radius:20px; margin-right:0.5rem;">🌐 ONLINE</span>
-                <a href="https://www.nhfournier.es/como-jugar/escoba/" target="_blank" style="color: var(--primary); text-decoration: none; font-size: 0.9rem; border: 1px solid var(--primary); padding: 0.2rem 0.8rem; border-radius: 20px; transition: all 0.3s; display: inline-block;">📖 Cómo jugar</a>
+            <div class="game-nav-header">
+                <div>
+                    <span style="color:#4dff88; font-size:0.8rem; border:1px solid #4dff88; padding:0.2rem 0.6rem; border-radius:20px; margin-right:0.5rem;">🌐 ONLINE</span>
+                    <a href="https://www.nhfournier.es/como-jugar/escoba/" target="_blank" style="color: var(--primary); text-decoration: none; font-size: 0.9rem; border: 1px solid var(--primary); padding: 0.2rem 0.8rem; border-radius: 20px; transition: all 0.3s; display: inline-block;">📖 Cómo jugar</a>
+                </div>
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; background: rgba(0,0,0,0.2); padding: 0.8rem; border-radius: 12px; border: 1px solid var(--glass-border);">
                 <div>
@@ -355,16 +371,18 @@ function renderMultiplayerEscobaBoard() {
                    <div style="color: #fff; font-weight: 700; font-size: 1.2rem;">${guestState.points} <span style="font-size: 0.7rem; opacity: 0.5;">(${guestState.capturedCount} cartas)</span></div>
                 </div>
             </div>
-            <div class="area" style="min-height: 200px; display: flex; flex-direction: column; justify-content: center;">
+            <div class="area" style="min-height: 160px; display: flex; flex-direction: column; justify-content: center;">
                 <div class="area-label" style="text-align: center;">Mesa</div>
                 <div id="table-area"></div>
             </div>
-            <div style="text-align: center; margin: 2rem 0;">
-                <button class="primary-btn" id="make-move-btn" style="padding: 1rem 3rem; font-size: 1.1rem; border: 2px solid rgba(255,255,255,0.1);">REALIZAR JUGADA</button>
+            <div style="text-align: center; margin: 1.5rem 0;">
+                <button class="primary-btn" id="make-move-btn" style="padding: 0.8rem 2rem; font-size: 1rem; border: 2px solid rgba(255,255,255,0.1);">REALIZAR JUGADA</button>
             </div>
             <div class="area">
                 <div class="area-label" style="text-align: center;">Tu Mano</div>
-                <div id="hand-area"></div>
+                <div class="hand-container">
+                    <div id="hand-area"></div>
+                </div>
             </div>
         </div>
     `;
@@ -511,6 +529,10 @@ function startMultiplayerGameAsGuest(gameId, config) {
         startGuestEscoba(config);
     } else if (gameId === 'chinchon') {
         startGuestChinchon(config);
+    } else if (gameId === 'mus') {
+        startGuestMus(config);
+    } else if (gameId === 'tute') {
+        startGuestTute(config);
     }
 }
 
@@ -550,16 +572,18 @@ function renderGuestEscobaBoard(state) {
                    <div style="color: #fff; font-weight: 700; font-size: 1.2rem;">${state.hostPoints} <span style="font-size: 0.7rem; opacity: 0.5;">(${state.hostCaptured} cartas)</span></div>
                 </div>
             </div>
-            <div class="area" style="min-height: 200px; display: flex; flex-direction: column; justify-content: center;">
+            <div class="area" style="min-height: 160px; display: flex; flex-direction: column; justify-content: center;">
                 <div class="area-label" style="text-align: center;">Mesa</div>
                 <div id="table-area"></div>
             </div>
-            <div style="text-align: center; margin: 2rem 0;">
-                <button class="primary-btn" id="make-move-btn" style="padding: 1rem 3rem; font-size: 1.1rem;">REALIZAR JUGADA</button>
+            <div style="text-align: center; margin: 1.5rem 0;">
+                <button class="primary-btn" id="make-move-btn" style="padding: 0.8rem 2rem; font-size: 1rem;">REALIZAR JUGADA</button>
             </div>
             <div class="area">
                 <div class="area-label" style="text-align: center;">Tu Mano</div>
-                <div id="hand-area"></div>
+                <div class="hand-container">
+                    <div id="hand-area"></div>
+                </div>
             </div>
         </div>
     `;
@@ -605,7 +629,7 @@ function startGuestChinchon(config) {
 function renderGuestChinchonBoard(state) {
     gameInfo.innerHTML = `
         <div id="chinchon-ui">
-            <div style="text-align: right; margin-bottom: 0.5rem;">
+            <div class="game-nav-header">
                 <span style="color:#4dff88; font-size:0.8rem; border:1px solid #4dff88; padding:0.2rem 0.6rem; border-radius:20px;">🌐 ONLINE</span>
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; background: rgba(0,0,0,0.2); padding: 0.8rem; border-radius: 12px; border: 1px solid var(--glass-border);">
@@ -692,7 +716,7 @@ function startEscoba() {
 function renderEscobaBoard(isDeal = false) {
     const redealt = activeGame.checkRedeal();
     if (redealt) {
-        alert('¡Mano terminada! Nuevas cartas repartidas del mazo.');
+        // alert('¡Mano terminada! Nuevas cartas repartidas del mazo.'); // Popup removed
         isDeal = true;
     }
 
@@ -707,7 +731,7 @@ function renderEscobaBoard(isDeal = false) {
 
     gameInfo.innerHTML = `
         <div id="escoba-ui">
-            <div style="text-align: right; margin-bottom: 0.5rem;">
+            <div class="game-nav-header">
                 <a href="https://www.nhfournier.es/como-jugar/escoba/" target="_blank" style="color: var(--primary); text-decoration: none; font-size: 0.9rem; border: 1px solid var(--primary); padding: 0.2rem 0.8rem; border-radius: 20px; transition: all 0.3s; display: inline-block;">📖 Cómo jugar</a>
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; background: rgba(0,0,0,0.2); padding: 0.8rem; border-radius: 12px; border: 1px solid var(--glass-border);">
@@ -724,16 +748,18 @@ function renderEscobaBoard(isDeal = false) {
                    <div style="color: #fff; font-weight: 700; font-size: 1.2rem;">${aiState.points} <span style="font-size: 0.7rem; opacity: 0.5;">(${aiState.capturedCount} cartas)</span></div>
                 </div>
             </div>
-            <div class="area" style="min-height: 200px; display: flex; flex-direction: column; justify-content: center;">
+            <div class="area" style="min-height: 160px; display: flex; flex-direction: column; justify-content: center;">
                 <div class="area-label" style="text-align: center;">Mesa</div>
                 <div id="table-area"></div>
             </div>
-            <div style="text-align: center; margin: 2rem 0;">
-                <button class="primary-btn" id="make-move-btn" style="padding: 1rem 3rem; font-size: 1.1rem; border: 2px solid rgba(255,255,255,0.1);">REALIZAR JUGADA</button>
+            <div style="text-align: center; margin: 1.5rem 0;">
+                <button class="primary-btn" id="make-move-btn" style="padding: 0.8rem 2rem; font-size: 1rem; border: 2px solid rgba(255,255,255,0.1);">REALIZAR JUGADA</button>
             </div>
             <div class="area">
                 <div class="area-label" style="text-align: center;">Tu Mano</div>
-                <div id="hand-area"></div>
+                <div class="hand-container">
+                    <div id="hand-area"></div>
+                </div>
             </div>
         </div>
     `;
@@ -878,7 +904,7 @@ function performAITurnEscoba() {
         const aiPlayer = activeGame.players[1];
         if (!aiPlayer.hand.length) return;
         
-        const move = AIEngine.getEscobaMove(aiPlayer.hand, activeGame.tableCards);
+        const move = AIEngine.getEscobaMove(aiPlayer.hand, activeGame.tableCards, window.aiDifficulty || 'experto');
         const result = activeGame.playTurn(aiPlayer, move.handCard, move.tableSubset);
         
         // alert(`La IA ha jugado el ${move.handCard.name}. ${result.message}`);
@@ -898,7 +924,7 @@ function renderChinchonBoard(isDeal = false) {
 
     gameInfo.innerHTML = `
         <div id="chinchon-ui">
-            <div style="text-align: right; margin-bottom: 0.5rem;">
+            <div class="game-nav-header">
                 <a href="https://www.nhfournier.es/como-jugar/chinchon/" target="_blank" style="color: var(--primary); text-decoration: none; font-size: 0.9rem; border: 1px solid var(--primary); padding: 0.2rem 0.8rem; border-radius: 20px; transition: all 0.3s; display: inline-block;">📖 Cómo jugar</a>
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; background: rgba(0,0,0,0.2); padding: 0.8rem; border-radius: 12px; border: 1px solid var(--glass-border);">
@@ -934,12 +960,13 @@ function renderChinchonBoard(isDeal = false) {
                 <div class="area-label" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
                    <span>Tu Mano <span style="font-size:0.7rem; opacity:0.5;">(arrastra para reordenar)</span></span>
                    <div style="display:flex; gap:0.5rem;">
-                       <button id="sort-by-rank-btn" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color:#fff; padding: 0.2rem 0.7rem; border-radius:20px; cursor:pointer; font-size:0.75rem; transition: all 0.2s;">🔢 Por número</button>
-                       <button id="sort-by-suit-btn" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color:#fff; padding: 0.2rem 0.7rem; border-radius:20px; cursor:pointer; font-size:0.75rem; transition: all 0.2s;">🃏 Por palo</button>
-                       ${state.isMyTurn && state.hasDrawnThisTurn ? '<span style="color: var(--primary);">Arrastra al descarte para descartar</span>' : ''}
+                       <button id="sort-by-rank-btn" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color:#fff; padding: 0.2rem 0.7rem; border-radius:20px; cursor:pointer; font-size:0.75rem; transition: all 0.2s;">🔢 Nros</button>
+                       <button id="sort-by-suit-btn" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color:#fff; padding: 0.2rem 0.7rem; border-radius:20px; cursor:pointer; font-size:0.75rem; transition: all 0.2s;">🃏 Palo</button>
                    </div>
                 </div>
-                <div id="hand-area" style="display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; min-height: 140px; padding: 0.5rem; border: 2px dashed rgba(255,255,255,0.06); border-radius: 12px; margin-top: 0.5rem;"></div>
+                <div class="hand-container">
+                    <div id="hand-area" style="min-height: 140px; padding: 0.5rem; border: 2px dashed rgba(255,255,255,0.06); border-radius: 12px; margin-top: 0.5rem;"></div>
+                </div>
             </div>
             <div style="text-align: center; margin-top: 2rem;">
                 <button class="primary-btn" id="close-round-btn" ${!state.isMyTurn || state.hasDrawnThisTurn ? 'disabled style="opacity:0.5"' : ''}>CERRAR RONDA (Menos o igual a 5 pts)</button>
@@ -1094,7 +1121,7 @@ function performAITurnChinchon() {
             return;
         }
 
-        const move = AIEngine.getChinchonMove(aiPlayer.hand, state.discardTop, activeGame);
+        const move = AIEngine.getChinchonMove(aiPlayer.hand, state.discardTop, activeGame, window.aiDifficulty || 'experto');
         
         if (move.drawFromDeck || !state.discardTop) {
             activeGame.drawFromDeck(aiPlayer);
@@ -1201,7 +1228,7 @@ function startMus() {
 function renderMusBoard() {
     gameInfo.innerHTML = `
         <div id="mus-ui">
-            <div style="text-align: right; margin-bottom: 0.5rem;">
+            <div class="game-nav-header">
                 <a href="https://www.nhfournier.es/como-jugar/mus/" target="_blank" style="color: var(--primary); text-decoration: none; font-size: 0.9rem; border: 1px solid var(--primary); padding: 0.2rem 0.8rem; border-radius: 20px; transition: all 0.3s; display: inline-block;">📖 Cómo jugar</a>
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 2rem; background: rgba(0,0,0,0.2); padding: 0.8rem; border-radius: 12px; border: 1px solid var(--glass-border);">
@@ -1225,7 +1252,8 @@ function renderMusBoard() {
                 <button class="primary-btn" onclick="musAction('pares')">Pares (Envido)</button>
                 <button class="primary-btn" onclick="musAction('juego')">Juego (Envido)</button>
                 <button class="primary-btn" style="grid-column: span 1; background: #2a2a2a; border: 1px solid var(--primary);" onclick="toggleSignals()">💬 Hacer Seña</button>
-                <button class="primary-btn" style="background: transparent; border: 1px solid var(--primary); color: var(--primary);" onclick="showMusResults()">RESOLVER RONDA</button>
+                <button class="primary-btn" style="background: transparent; border: 1px solid var(--primary); color: #ffeb3b;" onclick="musAction('paso')">Paso</button>
+                <button class="primary-btn" style="grid-column: span 2; background: transparent; border: 1px solid var(--primary); color: var(--primary);" onclick="showMusResults()">RESOLVER RONDA</button>
             </div>
 
             <div id="mus-signals-menu" style="display: none; justify-content: center; gap: 1rem; margin-bottom: 2rem;">
@@ -1237,7 +1265,9 @@ function renderMusBoard() {
 
             <div class="area">
                 <div class="area-label">Tu Mano</div>
-                <div id="hand-area" style="display: flex; justify-content: center; gap: 1rem;"></div>
+                <div class="hand-container">
+                    <div id="hand-area"></div>
+                </div>
             </div>
         </div>
     `;
@@ -1250,18 +1280,31 @@ function renderMusBoard() {
 }
 
 window.musAction = (type) => {
+    if (mp) mp.sendAction({ type: 'mus-action', action: type });
     const messages = {
         grande: 'Has envidado a la Grande. La IA está pensando su respuesta...',
         chica: 'Has envidado a la Chica. ¡La IA se lo está pensando!',
         pares: '¿Tienes pares? Has envidado.',
         juego: 'Duelo de Juego (31+). Envido.',
-        ordago: '¡ÓRDAGO POR EL JUEGO COMPLETO!'
+        ordago: '¡ÓRDAGO POR EL JUEGO COMPLETO!',
+        paso: 'Has pasado esta mano.'
     };
     alert(messages[type]);
     
     setTimeout(() => {
         if (!activeGame) return;
-        const won = Math.random() > 0.4;
+        if (type === 'paso') {
+            alert('Has pasado. Turno de la IA (pasa también o inicia apuesta).');
+            return;
+        }
+        
+        let won = false;
+        if (activeGame && activeGame.players[1].hand) {
+            won = !AIEngine.getMusBet(activeGame.players[1].hand, type, activeGame, window.aiDifficulty || 'experto');
+        } else {
+            won = Math.random() > 0.4;
+        }
+
         if (won) {
             alert('¡La IA ha dicho "No Quiero"! Te llevas 1 piedra parcial.');
         } else {
@@ -1337,6 +1380,51 @@ window.exitMusGame = () => {
     renderStats();
 };
 
+// ---------- MULTIPLAYER MUS & TUTE ----------
+function startMultiplayerMus() {
+    activeGame = new MusGame([activeUser.name, mp.remoteName]);
+    activeGame.start();
+    mp.sendGameStart('mus', { players: [activeUser.name, mp.remoteName] });
+    
+    mp.onGameAction = (action) => {
+        if (action.type === 'mus-action') {
+            mp.sendAlert(`El rival usó: ${action.action}`);
+        }
+    };
+    renderMusBoard();
+}
+
+function startGuestMus(config) {
+    overlay.style.display = 'flex';
+    gameTitle.innerText = 'Mus — Multijugador';
+    mp.onAlert = (msg) => alert(msg);
+    gameInfo.innerHTML = `<div style="text-align: center; padding: 2rem;">
+        <h3 style="color: #4dff88;">Partida de Mus en curso...</h3>
+        <p>El anfitrión controla el estado del juego. (Modo invitado en desarrollo)</p>
+        <button class="primary-btn" onclick="exitMultiplayerGame()">SALIR</button>
+    </div>`;
+}
+
+function startMultiplayerTute() {
+    activeGame = new TuteGame([activeUser.name, mp.remoteName]);
+    activeGame.start();
+    mp.sendGameStart('tute', { players: [activeUser.name, mp.remoteName] });
+    
+    mp.onGameAction = (action) => {};
+    renderTuteBoard();
+}
+
+function startGuestTute(config) {
+    overlay.style.display = 'flex';
+    gameTitle.innerText = 'Tute — Multijugador';
+    mp.onAlert = (msg) => alert(msg);
+    gameInfo.innerHTML = `<div style="text-align: center; padding: 2rem;">
+        <h3 style="color: #4dff88;">Partida de Tute en curso...</h3>
+        <p>El anfitrión controla el estado del juego. (Modo invitado en desarrollo)</p>
+        <button class="primary-btn" onclick="exitMultiplayerGame()">SALIR</button>
+    </div>`;
+}
+
 // --- TUTE ---
 function startTute() {
     activeGame = new TuteGame([activeUser.name, 'IA Bot']);
@@ -1349,7 +1437,7 @@ function renderTuteBoard() {
 
     gameInfo.innerHTML = `
         <div id="tute-ui">
-            <div style="text-align: right; margin-bottom: 0.5rem;">
+            <div class="game-nav-header">
                 <a href="https://www.nhfournier.es/como-jugar/tute/" target="_blank" style="color: var(--primary); text-decoration: none; font-size: 0.9rem; border: 1px solid var(--primary); padding: 0.2rem 0.8rem; border-radius: 20px; transition: all 0.3s; display: inline-block;">📖 Cómo jugar</a>
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 2rem; background: rgba(0,0,0,0.2); padding: 0.8rem; border-radius: 12px; border: 1px solid var(--glass-border);">
@@ -1357,37 +1445,94 @@ function renderTuteBoard() {
                    <div class="area-label" style="font-size: 0.6rem; opacity: 0.6;">Tus Puntos</div>
                    <div style="color: var(--primary); font-weight: 900; font-size: 1.2rem;">${activeGame.players[0].totalPoints || 0}</div>
                 </div>
-                <div style="text-align: center;">
-                    <div class="area-label" style="font-size: 0.6rem; opacity: 0.6;">Triunfo</div>
-                    <div style="font-size: 1.2rem; color: #fff; text-transform: uppercase;">${state.trump}</div>
-                </div>
-                <div style="text-align: right;">
-                   <div class="area-label" style="font-size: 0.6rem; opacity: 0.6;">IA (Bot)</div>
-                   <div style="color: #fff; font-weight: 700; font-size: 1.2rem;">${activeGame.players[1].totalPoints || 0}</div>
-                </div>
-            </div>
-            
-            <div class="area" style="min-height: 150px; display: flex; flex-direction: column; justify-content: center;">
-                <div class="area-label" style="text-align: center;">Mesa (Baza Actual)</div>
-                <div id="tute-table-area" style="display: flex; justify-content: center; gap: 1rem;"></div>
+            <div style="display: flex; justify-content: center; gap: 2rem; margin-bottom: 2rem;">
+                 <div class="area">
+                    <div class="area-label">Mazo (${state.deckRemaining})</div>
+                    <div id="tute-deck-zone" style="position:relative; width:80px; height:120px;">
+                        ${state.deckRemaining > 0 ? `<div class="card-back" style="width:100%; height:100%; position:absolute; z-index:2;"></div>` : ''}
+                        <div id="tute-trump-card" style="position:absolute; top: 10px; left: 20px; transform: rotate(90deg); z-index:1;"></div>
+                    </div>
+                 </div>
+                 <div class="area" style="flex-grow:1;">
+                    <div class="area-label" style="text-align: center;">Mesa (Baza)</div>
+                    <div id="tute-table-area" style="display: flex; justify-content: center; gap: 1rem; min-height:120px; background:rgba(0,0,0,0.1); border-radius:15px;"></div>
+                 </div>
             </div>
 
-            <div style="text-align: center; margin: 2rem 0;">
-                <button class="primary-btn" onclick="showTuteResults()" style="padding: 1rem 3rem; font-size: 1.1rem;">CERRAR MANO (Evaluar Puntos)</button>
+            <div style="text-align: center; margin: 1rem 0;">
+                <div id="tute-status-msg" style="color:var(--primary); font-weight:bold; margin-bottom:0.5rem; height:1.2rem;">${state.turn === 0 ? 'Es tu turno' : 'Turno de la IA...'}</div>
             </div>
 
             <div class="area">
+                <div class="area-label">Tu Mano</div>
+                <div class="hand-container">
+                    <div id="hand-area"></div>
+                </div>
+            </div>
+        </div>
+
+            <div class="area">
                 <div class="area-label">Tu Mano (10 Cartas)</div>
-                <div id="hand-area" style="display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap;"></div>
+                <div class="hand-container">
+                    <div id="hand-area"></div>
+                </div>
             </div>
         </div>
     `;
 
     const handArea = document.getElementById('hand-area');
+    const tableArea = document.getElementById('tute-table-area');
+    const trumpArea = document.getElementById('tute-trump-card');
+
+    if (state.trumpCard) {
+        trumpArea.appendChild(board.renderCard(state.trumpCard, true));
+    }
+
+    state.currentTrick.forEach(trickItem => {
+        const cardEl = board.renderCard(trickItem.card, true);
+        tableArea.appendChild(cardEl);
+    });
+
     activeGame.players[0].hand.forEach(card => {
         const cardEl = board.renderCard(card);
+        cardEl.onclick = () => {
+            if (state.turn !== 0) return;
+            const res = activeGame.playCard(0, card);
+            if (res.success) {
+                renderTuteBoard();
+                if (activeGame.gamePhase === 'finished') {
+                    showTuteResults();
+                } else {
+                    setTimeout(() => performAITurnTute(), 1000);
+                }
+            } else {
+                alert(res.message);
+            }
+        };
         handArea.appendChild(cardEl);
     });
+}
+
+function performAITurnTute() {
+    if (!activeGame || activeGame.turn !== 1) return;
+    const state = activeGame.getGameState(1);
+    const aiPlayer = activeGame.players[1];
+    if (aiPlayer.hand.length === 0) return;
+
+    // Simplified AI: Use AIEngine or just play first card for now
+    const leadCard = state.currentTrick.length > 0 ? state.currentTrick[0].card : null;
+    const cardToPlay = AIEngine.getTuteMove(aiPlayer.hand, leadCard, activeGame.trumpSuit, activeGame, window.aiDifficulty || 'experto');
+    
+    const res = activeGame.playCard(1, cardToPlay);
+    if (res.success) {
+        renderTuteBoard();
+        if (activeGame.gamePhase === 'finished') {
+            showTuteResults();
+        } else if (activeGame.turn === 1) {
+            // AI won the trick and goes again
+            setTimeout(() => performAITurnTute(), 1000);
+        }
+    }
 }
 
 window.showTuteResults = () => {

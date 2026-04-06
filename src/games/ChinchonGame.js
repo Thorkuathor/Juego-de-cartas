@@ -133,7 +133,8 @@ export class ChinchonGame {
 
   calculateScores() {
       return this.players.map(p => {
-          const pts = this._autoCalculateBestPoints(p.hand);
+          let pts = this._autoCalculateBestPoints(p.hand);
+          if (pts === 0) pts = -10;
           p.pointsInRound = pts;
           return {
               id: p.id,
